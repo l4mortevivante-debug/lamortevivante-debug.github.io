@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>StudyOS Acadêmico</title>
+<style>
+:root{--bg:#f8f6fb;--s:#ffffff;--s2:#f0ecf5;--b:#e2d9ec;--t:#2d2935;--m:#6b6475;--ok:#2e7d51;--alta:#a83232;--media:#9c7414;--baixa:#2b6cb0}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--t);font:15px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif}
+h1,h2,h3{font-family:"Iowan Old Style",Georgia,serif;font-weight:600;margin:0}
+main{max-width:1080px;margin:0 auto;padding:28px 18px 80px}
+header h1{font-size:30px}
+header p{color:var(--m);margin:6px 0 18px;max-width:62ch}
+section{margin-top:38px}
+section>h2{font-size:21px;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--b)}
+.box{background:var(--s);border:1px solid var(--b);border-radius:6px;padding:14px;box-shadow:0 1px 3px rgba(107,100,117,0.05)}
+.bar{height:10px;background:var(--s2);border-radius:5px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--ok);width:0;transition:width .3s}
+.top{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.top .big{font:600 34px Georgia,serif;min-width:92px}
+.top .grow{flex:1;min-width:200px}
+.ctl{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:12px;color:var(--m);font-size:13px}
+input[type=number]{width:60px;background:var(--s);color:var(--t);border:1px solid var(--b);border-radius:4px;padding:4px 6px}
+button{background:var(--s2);color:var(--t);border:1px solid var(--b);border-radius:4px;padding:5px 11px;cursor:pointer;font:inherit}
+button:hover{background:#e8dff3}
+button:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid #8b5cf6;outline-offset:2px}
+.pills{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.pills button{font-size:13px}
+.pills button.on{background:#d8b4fe;border-color:#a855f7;color:#3b0764;font-weight:600}
+.pills small{color:var(--m);margin-left:5px}
+.days{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
+.day h3{font-size:16px;margin-bottom:8px;display:flex;justify-content:space-between}
+.day h3 span{font:13px system-ui;color:var(--m)}
+.sub{border-left:3px solid var(--c);padding:8px 0 8px 10px;margin-top:10px}
+.sub b{font-size:14px}
+.tag{font-size:11.5px;padding:1px 7px;border-radius:3px;margin-left:6px;white-space:nowrap}
+.tag.A{background:#fde8e8;color:#9b1c1c}.tag.M{background:#fef3c7;color:#92400e}.tag.B{background:#e1effe;color:#1e429f}
+.sub .pass{color:var(--m);font-size:12.5px}
+label{display:flex;gap:8px;align-items:flex-start;margin-top:7px;font-size:13.5px;cursor:pointer}
+label input{margin-top:4px;accent-color:var(--ok)}
+label em{display:block;color:var(--m);font-size:12.5px}
+label.done>span{opacity:.5;text-decoration:line-through}
+.cad{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.cad .box{border-top:3px solid var(--c)}
+.cad h3{font-size:15px}
+.cad .row{display:flex;justify-content:space-between;font-size:12.5px;color:var(--m);margin:7px 0 3px}
+.cad .bar i{background:var(--c)}
+.cn{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px;margin-top:10px}
+.bib{margin:10px 0 0;padding-left:16px;font-size:12.5px;color:var(--m)}
+.dic .box{margin-bottom:10px}
+.dic dt{font-weight:600}
+.dic dd{margin:2px 0 10px;color:#4a4552;font-size:14px}
+.dic dd:last-child{margin-bottom:0}
+.note{color:var(--m);font-size:13px}
+@media(max-width:480px){.days{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<main>
+<header>
+  <h1>StudyOS Acadêmico</h1>
+  <p>Ciclo de leitura para o mestrado: sete cadeiras em rodízio, três passos por cadeira por dia, e uma semana final para consolidar e treinar a fala.</p>
+  <div class="box">
+    <div class="top">
+      <div class="big" id="pct">0%</div>
+      <div class="grow"><div class="bar"><i id="gbar"></i></div><div class="note" id="gtxt" style="margin-top:6px"></div></div>
+    </div>
+    <div class="ctl">
+      <label style="margin:0;cursor:default">Semanas do ciclo
+        <input type="number" id="weeks" min="4" max="16"></label>
+      <button id="apply">Aplicar</button>
+      <button id="reset">Zerar progresso</button>
+      <span>Seu progresso fica salvo neste navegador.</span>
+    </div>
+  </div>
+</header>
+
+<section id="cronograma">
+  <h2>Cronograma semanal</h2>
+  <div class="pills" id="pills"></div>
+  <div class="days" id="days"></div>
+  <p class="note">Fins de semana: descanso ou leitura fluida, sem meta. Cada tópico volta mais de uma vez no ciclo, em nível crescente: leitura base, aprofundamento, articulação.</p>
+</section>
+
+<section id="cadeiras">
+  <h2>Acompanhamento das 7 cadeiras</h2>
+  <div class="cad" id="cad"></div>
+</section>
+
+<section id="conceitos">
+  <h2>Conceitos-chave para dominar</h2>
+  <p class="note" id="cnote"></p>
+  <div class="cn" id="cn"></div>
+</section>
+
+<section id="dicionario">
+  <h2>Dicionário de conceitos e arsenal de frases</h2>
+  <div class="pills" id="dpills"></div>
+  <div class="dic" id="dic"></div>
+</section>
+</main>
+
+<script>
+/* Dados: [nome, peso, cor, [[tópico, incidência, [termo1, frase1], [termo2, frase2], pergunta], ...]] */
+const D=[
+["Deleuze & Guattari",10,"#8b5cf6",[
+["Rizoma contra a árvore","A",["Agenciamento","O corpus se lê como um agenciamento que conecta corpos, práticas e enunciados sem hierarquia prévia."],["Desterritorialização","A montagem desterritorializa o olhar ao arrancá-lo de sua função narrativa."],"O rizoma não corre o risco de virar sinônimo vago de rede? O que o diferencia?"],
+["Corpo sem Órgãos","A",["Plano de consistência","O CsO não é um corpo biológico, mas um plano de consistência onde o desejo circula."],["Estrato","Ler o gênero como estrato permite ver o que a norma sedimenta e o que escapa dela."],"Por que o CsO não é um corpo 'liberto', e sim uma prática de experimentação?"],
+["Desejo e Anti-Édipo","A",["Máquinas desejantes","O filme opera como máquina desejante, ligando fluxos de imagem, voz e corpo."],["Produção desejante","Ao tratar o desejo como produção, e não falta, desloca-se a leitura psicanalítica clássica."],"Em que sentido a esquizoanálise desloca a psicanálise sem simplesmente negá-la?"],
+["Corpocinesia e afeto","M",["Afeto","O afeto aqui é variação de potência do corpo, não emoção psicológica."],["Devir","O devir não é imitação nem identificação, mas zona de vizinhança entre termos heterogêneos."],"Como diferenciar afeto de emoção ao analisar uma cena?"],
+["Espinosa e etologia","A",["Etologia","A etologia, em Deleuze, estuda o que um corpo pode, isto é, seus afetos, e não sua essência."],["Univocidade do ser","Com o Deus espinosiano, a univocidade do ser dissolve a hierarquia entre Criador e criatura."],"Por que Deleuze lê Espinosa como filosofia prática e não como sistema metafísico?"],
+["Cartografia e linhas de fuga","A",["Linha de fuga","A linha de fuga é saída criadora de um agenciamento, e não simples evasão."],["Cartografia","A cartografia acompanha processos de subjetivação em vez de representar um território dado."],"Como o método cartográfico (Rolnik) difere de uma pesquisa que apenas descreve um objeto?"],
+["Três ecologias e caosmose","A",["Ecosofia","A ecosofia articula as ecologias do meio ambiente, das relações sociais e da subjetividade."],["Caosmose","A caosmose designa a produção de subjetividade num plano de caos e complexidade."],"Por que Guattari trata a crise ecológica também como crise de subjetividade?"]
+],["Guattari: Revolução Molecular","Guattari: Caosmose","Guattari: As três ecologias","Deleuze: Espinosa, filosofia prática","Deleuze: Imagem-movimento","Deleuze: Imagem-tempo","Suely Rolnik: Cartografia"]],
+["Ismail Xavier",8,"#b45309",[
+["Cinema moderno e opacidade","A",["Transparência clássica","A decupagem clássica busca a transparência, apagando as marcas da enunciação."],["Opacidade","O cinema moderno expõe a opacidade do dispositivo e convoca o espectador à reflexão."],"O que torna um filme 'moderno' em oposição ao cinema clássico?"],
+["Alegoria e Cinema Novo","A",["Alegoria","A alegoria permite ler a nação por meio de figuras que condensam conflitos históricos."],["Esgotamento do modelo","Lê-se o esgotamento do modelo como sintoma de impasse histórico, não só estilístico."],"Por que a alegoria foi uma forma produtiva para o cinema brasileiro da época?"],
+["Decupagem e mise-en-scène","M",["Decupagem","A decupagem organiza o espaço fílmico e orienta o olhar do espectador."],["Plano-sequência","O plano-sequência suspende a fragmentação e redistribui o tempo da cena."],"Como a escolha de decupagem produz sentido político?"],
+["Espectador e enunciação","M",["Identificação","A identificação sustenta a ilusão de acesso direto ao mundo representado."],["Enunciação","Marcar a enunciação torna visível quem fala e de onde se fala no filme."],"O espectador é passivo diante da imagem? Defenda uma posição."],
+["Enquadramento e imagem-tempo","A",["Enquadramento","O enquadramento recorta o visível e define o que fica fora de campo."],["Imagem-tempo","Na imagem-tempo, a situação óptica pura rompe o encadeamento sensório-motor."],"O que o enquadramento mostra e o que exclui? Que ponte isso faz com Butler?"]
+],["Ismail Xavier: Opacidade e transparência"]],
+["Judith Butler",9,"#db2777",[
+["Performatividade","A",["Performatividade","O gênero é performativo: efeito de atos reiterados, e não expressão de uma essência."],["Iterabilidade","A iterabilidade abre brechas, pois toda repetição pode falhar ou deslocar a norma."],"Performatividade é o mesmo que performance? Onde está a diferença?"],
+["Inteligibilidade e abjeção","A",["Matriz de inteligibilidade","A matriz de inteligibilidade define quais corpos e vidas contam como reconhecíveis."],["Abjeção","A abjeção marca o que a norma precisa excluir para se constituir."],"Como a norma produz aquilo que ela diz apenas descrever?"],
+["Precariedade e luto","A",["Precariedade","A precariedade é condição compartilhada, mas distribuída de modo desigual."],["Enquadramento","O enquadramento decide quais vidas aparecem como passíveis de luto."],"Quais vidas são passíveis de luto, e quem decide isso?"],
+["Vulnerabilidade e assembleia","M",["Vulnerabilidade","A vulnerabilidade pode ser recurso político, e não apenas déficit."],["Interdependência","Pensar a interdependência desloca o sujeito autônomo como medida do político."],"Vulnerabilidade e resistência são opostos? Argumente."],
+["Foucault: dispositivo e crítica","A",["Dispositivo da sexualidade","O dispositivo da sexualidade produz sujeitos ao mesmo tempo em que regula corpos."],["Crítica como atitude","Em Foucault, a crítica é a arte de não ser governado de determinada maneira."],"Como a autenticidade em Foucault difere de uma identidade verdadeira a descobrir?"],
+["Fracasso queer e disforia de mundo","M",["Fracasso queer","O fracasso queer recusa a lógica do sucesso normativo como medida de valor."],["Disforia de mundo","A disforia de mundo nomeia o mal-estar de um regime que gere corpos e subjetividades."],"Fracassar pode ser estratégia política? Em que condições?"]
+],["Butler: Quadros de guerra","Butler: Problemas de gênero","Foucault: História da sexualidade","Foucault: O que é a crítica","Jack Halberstam: fracasso queer","Paul Preciado: Dysphoria mundi"]],
+["Dziga Vertov",7,"#ca8a04",[
+["Cine-Olho","A",["Cine-Olho","O Cine-Olho propõe uma visão maquínica que ultrapassa os limites do olho humano."],["Kinoks","Os kinoks defendiam um cinema sem roteiro, atores ou estúdio."],"O que Vertov ganha, e o que perde, ao recusar a ficção?"],
+["Montagem e intervalo","A",["Teoria dos intervalos","Na teoria dos intervalos, o sentido nasce da passagem entre os planos."],["Montagem","A montagem em Vertov é método de conhecimento, e não só de ritmo."],"Por que o intervalo, e não o plano, é a unidade de sentido?"],
+["Reflexividade em Um homem com a câmera","M",["Reflexividade","O filme é reflexivo: mostra sua própria produção como parte do argumento."],["Cine-verdade","O cine-verdade constrói a verdade pela montagem, e não por mero registro."],"Documentário reflexivo é mais 'verdadeiro' que o observacional?"],
+["Vanguarda soviética","B",["Construtivismo","O construtivismo aproxima arte e produção, como se vê na estética vertoviana."],["Faktura","A noção de faktura destaca a materialidade do procedimento artístico."],"Qual o contexto político que torna possível o projeto de Vertov?"],
+["Ensaio fílmico e montagem de atrações","M",["Ensaio fílmico","O ensaio fílmico pensa com imagens, sem se submeter a um enredo."],["Montagem de atrações","Em Eisenstein, a montagem de atrações busca produzir choque e efeito sobre o espectador."],"Em que Vertov e Eisenstein divergem sobre a função da montagem?"]
+],["Vertov: Cine-olho e ensaios","Eisenstein: O sentido do filme"]],
+["Donna Haraway",9,"#0d9488",[
+["Ciborgue","A",["Ciborgue","O ciborgue desfaz dualismos como humano/máquina e natureza/cultura."],["Fronteira","A fronteira é lugar de disputa e de conexão, e não de separação estável."],"O ciborgue é uma utopia, uma ironia ou uma ferramenta analítica?"],
+["Saberes localizados","A",["Objetividade parcial","A objetividade parcial recusa o 'olhar de lugar nenhum' e assume o ponto de vista."],["Situacionalidade","Reconhecer a situacionalidade do saber é condição de responsabilidade, e não relativismo."],"Saber situado é o mesmo que relativismo? Por quê?"],
+["Parentesco e simpoiese","M",["Parentesco multiespécie","O parentesco multiespécie desloca a família biológica como unidade de vínculo."],["Simpoiese","A simpoiese descreve o fazer-com, em oposição à autopoiese isolada."],"O que significa 'fazer parentes' além do humano?"],
+["Espécies companheiras","M",["Espécies companheiras","Pensar com espécies companheiras reconfigura o que entendemos por agência."],["Naturezaculturas","O termo naturezaculturas rejeita a separação entre o dado e o construído."],"Como o pós-humanismo de Haraway difere de um tecno-otimismo?"],
+["Chthuluceno","A",["Chthuluceno","O Chthuluceno propõe pensar a vida em emaranhados multiespécies, contra a narrativa do Antropoceno."],["Ficar com o problema","Ficar com o problema é recusar tanto o desespero quanto a promessa tecnológica de salvação."],"Por que Haraway prefere Chthuluceno a Antropoceno?"]
+],["Haraway: Staying with the Trouble (Chthuluceno)"]],
+["Estudos Literários",8,"#2563eb",[
+["Forma e história","A",["Forma literária","A forma literária cristaliza, de modo mediado, processos sociais."],["Mediação","A mediação evita ler a obra como simples reflexo do contexto."],"Como a forma de uma obra carrega história sem ilustrá-la?"],
+["Cânone e crítica cultural","A",["Cânone","O cânone é resultado de disputas institucionais, e não de valor intrínseco."],["Campo literário","No campo literário, as posições dos agentes condicionam o que se reconhece como arte."],"Quem define o que entra no cânone, e com quais critérios?"],
+["Narrador e ponto de vista","M",["Foco narrativo","O foco narrativo organiza o acesso do leitor ao mundo ficcional."],["Verossimilhança","A verossimilhança é convenção histórica, e não cópia do real."],"Como a escolha do narrador define a posição social do texto?"],
+["Literatura e ideologia","B",["Ideologia da forma","A ideologia da forma aparece nas soluções que o texto dá a impasses sociais."],["Materialismo histórico","Uma leitura materialista histórica relaciona a obra às condições de sua produção."],"Toda leitura crítica é ideológica? Discuta."],
+["Teoria do conto","A",["Unidade de efeito","No conto, a unidade de efeito orienta cada elemento para uma impressão final."],["Narrativa breve","A narrativa breve exige concentração: tudo o que está no texto precisa funcionar."],"O que faz do conto um gênero específico e não só um romance curto?"],
+["Erotismo e transgressão","M",["Transgressão","Em Bataille, a transgressão não nega o interdito, mas o completa."],["Continuidade","O erotismo busca a continuidade do ser diante da descontinuidade dos indivíduos."],"Como Bataille liga erotismo, morte e interdito?"]
+],["Nádia Gotlib: Teoria do conto","Culler; Vasconcelos: Teoria literária, uma introdução","Bataille: Erotism: Death and Sensuality"]],
+["Estudos Históricos",8,"#57534e",[
+["Operação historiográfica","A",["Operação historiográfica","A operação historiográfica articula lugar social, prática e escrita."],["Regime de historicidade","Cada regime de historicidade organiza de modo próprio passado, presente e futuro."],"O que diferencia história de memória no seu objeto de pesquisa?"],
+["Memória e esquecimento","A",["Lugar de memória","O lugar de memória surge quando a memória espontânea já se perdeu."],["Memória coletiva","A memória coletiva é construída em quadros sociais, e não apenas lembrada."],"Esquecer também é um ato político? Em que casos?"],
+["Tempo e anacronismo","M",["Temporalidade","A temporalidade do evento não coincide com a do historiador."],["Anacronismo","O anacronismo pode ser erro, mas também método, quando controlado."],"Existe anacronismo produtivo? Como defendê-lo?"],
+["Fonte, indício e escala","B",["Paradigma indiciário","O paradigma indiciário lê pistas marginais como acesso ao conjunto."],["Escala","Variar a escala de análise muda quais conexões ficam visíveis."],"Micro-história: o pequeno ilumina o grande ou o substitui?"],
+["Nação e identidade","A",["Etnogênese","A etnogênese mostra que povos e nações são construídos, e não dados desde sempre."],["Sujeito descentrado","Para Hall, a pós-modernidade fragmenta identidades antes tidas como unificadas."],"Se as nações são inventadas, isso as torna menos reais? Discuta."],
+["Sobrevivência e vida nua","M",["Sobrevivência das imagens","A sobrevivência das imagens indica que o passado retorna em formas que escapam à cronologia."],["Vida nua","A vida nua é a vida exposta ao poder soberano, sem proteção política."],"O que torna alguém contemporâneo segundo Agamben?"]
+],["Harvey: A produção capitalista do espaço","Agamben: Homo sacer I; O que é o contemporâneo?","Didi-Huberman: A imagem sobrevivente; Sobrevivência dos vaga-lumes; Diante da imagem","Stuart Hall: A identidade cultural na pós-modernidade","Geary: O mito das nações","Gell: The Anthropology of Time","Grimberg: História universal I","Pinsky: As primeiras civilizações","Coleção Revoluções do Século 20 (8 volumes)"]]
+];
+const CN=[["Deus espinosiano",0],["Enquadramento (teoria do cinema e Judith Butler)",1],["Territorialização, desterritorialização e linhas de fuga",0],["Cartografia",0],["Rizoma",0],["Etologia",0],["Universalização e neutralidade × subjetividade que vira identitarismo",4],["Saberes localizados",4],["Relativismo e objetivismo no meio acadêmico",4],["O olhar de Deus como neutralidade (Grosfoguel)",4],["Autenticidade em Foucault",2],["Abjeção em Kristeva",2],["Pós-moderno",6],["Pós-estruturalismo",5]];
+const PAT=[[0,2,6],[1,4,5],[0,3,2],[4,6,3],[0,1,5]];
+const DIAS=["Segunda","Terça","Quarta","Quinta","Sexta"];
+const INC={A:"Alta Incidência/Densidade",M:"Média Incidência/Densidade",B:"Baixa Incidência/Densidade"};
+const PASSO=["leitura base","aprofundamento","articulação"];
+const CONS=[
+["Mapa mental dos 7 autores","Rever 8 conceitos de Alta Incidência, 1 por autor, sem consulta","Explique em voz alta, por 2 minutos, como Deleuze e Butler se tocam"],
+["Releia seus fichamentos de Deleuze & Guattari e Haraway","Escreva 5 frases com o Arsenal Acadêmico sem olhar o dicionário","Responda em voz alta 3 perguntas de seminário gravando o áudio"],
+["Revisão ativa de Xavier e Vertov: conecte montagem, alegoria e opacidade","Reescreva 5 definições com suas palavras","Defenda uma tese curta sobre cinema moderno em 3 minutos"],
+["Revisão ativa de Estudos Literários e Históricos","Cruze forma, memória e historiografia em um parágrafo","Simule uma arguição: peça a alguém 4 perguntas surpresa"],
+["Simulado oral completo: 7 perguntas, 2 minutos cada","Ouça a gravação e anote hesitações e termos que faltaram","Liste 3 lacunas e 3 conquistas para o próximo ciclo"]
+];
+let S={};try{S=JSON.parse(localStorage.getItem("studyos")||"{}")}catch(e){}
+S.ck=S.ck||{};S.cn=S.cn||{};S.W=Math.min(16,Math.max(4,S.W||10));S.cur=S.cur||0;S.dic=S.dic||0;
+const save=()=>{try{localStorage.setItem("studyos",JSON.stringify(S))}catch(e){}};
+const $=id=>document.getElementById(id);
+
+/* Plano: semanas 0..W-2 = estudo em rodízio; última = consolidação */
+function plano(){
+  const occ=D.map(()=>0),P=[];
+  for(let w=0;w<S.W-1;w++){
+    P.push(DIAS.map((_,d)=>PAT[d].map(ci=>{
+      const o=occ[ci]++,L=D[ci][3].length,t=D[ci][3][o%L];
+      return{ci,t,pass:PASSO[Math.floor(o/L)%3]};
+    })));
+  }
+  P.push(CONS);
+  return P;
+}
+const key=(w,d,s,k)=>`${w}.${d}.${s}.${k}`;
+const ck=k=>!!S.ck[k];
+
+function contas(P){
+  let tot=0,ok=0;const pw=P.map(()=>[0,0]),pc=D.map(()=>[0,0]);
+  P.forEach((sem,w)=>sem.forEach((dia,d)=>{
+    if(w===P.length-1){for(let k=0;k<3;k++){pw[w][0]++;tot++;if(ck(key(w,d,0,k))){pw[w][1]++;ok++}}return}
+    dia.forEach((it,s)=>{for(let k=0;k<3;k++){const c=ck(key(w,d,s,k));tot++;pw[w][0]++;pc[it.ci][0]++;if(c){ok++;pw[w][1]++;pc[it.ci][1]++}}});
+  }));
+  return{tot,ok,pw,pc};
+}
+
+function render(){
+  const P=plano(),C=contas(P);S.cur=Math.min(S.cur,P.length-1);
+  const pct=C.tot?Math.round(C.ok/C.tot*100):0;
+  $("pct").textContent=pct+"%";$("gbar").style.width=pct+"%";
+  $("gtxt").textContent=`${C.ok} de ${C.tot} metas concluídas, em ${S.W} semanas`;
+  $("weeks").value=S.W;
+
+  $("pills").innerHTML=P.map((_,w)=>{
+    const p=C.pw[w][0]?Math.round(C.pw[w][1]/C.pw[w][0]*100):0;
+    return `<button data-w="${w}" class="${w===S.cur?"on":""}">${w===P.length-1?"Consolidação":"Semana "+(w+1)}<small>${p}%</small></button>`}).join("");
+
+  const w=S.cur,last=w===P.length-1;
+  $("days").innerHTML=P[w].map((dia,d)=>{
+    if(last){
+      const n=[0,1,2].filter(k=>ck(key(w,d,0,k))).length;
+      const nomes=["Revisão ativa","Arsenal acadêmico","Treino de fala"];
+      return `<div class="box day"><h3>${DIAS[d]}<span>${n}/3</span></h3>`+dia.map((tx,k)=>`<label class="${ck(key(w,d,0,k))?"done":""}"><input type="checkbox" data-k="${key(w,d,0,k)}" ${ck(key(w,d,0,k))?"checked":""}><span><em>${nomes[k]}</em>${tx}</span></label>`).join("")+`</div>`;
+    }
+    const n=dia.reduce((a,_,s)=>a+[0,1,2].filter(k=>ck(key(w,d,s,k))).length,0);
+    return `<div class="box day"><h3>${DIAS[d]}<span>${n}/9</span></h3>`+dia.map((it,s)=>{
+      const c=D[it.ci],t=it.t,K=k=>key(w,d,s,k),L=(k,tx,sub)=>`<label class="${ck(K(k))?"done":""}"><input type="checkbox" data-k="${K(k)}" ${ck(K(k))?"checked":""}><span>${tx}${sub?`<em>${sub}</em>`:""}</span></label>`;
+      return `<div class="sub" style="--c:${c[2]}"><b>${c[0]}</b><span class="tag ${t[1]}">${INC[t[1]]}</span><div class="pass">peso ${c[1]}, ${it.pass}</div>`
+       +L(0,`Fichamento: ${t[0]}`)
+       +L(1,`Arsenal: ${t[2][0]} e ${t[3][0]}`,`“${t[2][1]}” “${t[3][1]}”`)
+       +L(2,`Fala: ${t[4]}`)+`</div>`;
+    }).join("")+`</div>`;
+  }).join("");
+
+  const slots=D.map((_,i)=>PAT.flat().filter(x=>x===i).length);
+  $("cad").innerHTML=D.map((c,i)=>{
+    const nA=c[3].filter(t=>t[1]==="A").length,nM=c[3].filter(t=>t[1]==="M").length,nB=c[3].filter(t=>t[1]==="B").length;
+    const p=C.pc[i][0]?Math.round(C.pc[i][1]/C.pc[i][0]*100):0;
+    return `<div class="box" style="--c:${c[2]}"><h3>${i+1}. ${c[0]}</h3>
+    <div class="row"><span>Peso ${c[1]}/10</span><span>${slots[i]} dias por semana</span></div>
+    <div class="bar"><i style="width:${c[1]*10}%"></i></div>
+    <div class="row"><span><span class="tag A" style="margin:0">Alta ${nA}</span> <span class="tag M">Média ${nM}</span> <span class="tag B">Baixa ${nB}</span></span></div>
+    <div class="row"><span>Progresso</span><span>${p}%</span></div>
+    <div class="bar"><i style="width:${p}%"></i></div><ul class="bib">${c[4].map(x=>`<li>${x}</li>`).join("")}</ul></div>`}).join("");
+
+  $("cnote").textContent=`${CN.filter((_,i)=>S.cn[i]).length} de ${CN.length} conceitos que já consigo explicar em voz alta`;
+  $("cn").innerHTML=CN.map((c,i)=>`<label class="box ${S.cn[i]?"done":""}" style="border-left:3px solid ${D[c[1]][2]};margin:0"><input type="checkbox" data-c="${i}" ${S.cn[i]?"checked":""}><span>${c[0]}<em>${D[c[1]][0]}</em></span></label>`).join("");
+  $("dpills").innerHTML=D.map((c,i)=>`<button data-d="${i}" class="${i===S.dic?"on":""}">${c[0]}</button>`).join("");
+  const c=D[S.dic];
+  $("dic").innerHTML=`<div class="box" style="border-left:3px solid ${c[2]}"><dl style="margin:0">`+c[3].map(t=>
+    `<dt>${t[0]}<span class="tag ${t[1]}">${INC[t[1]]}</span></dt>`+[t[2],t[3]].map(x=>`<dd><b>${x[0]}:</b> “${x[1]}”</dd>`).join("")+`<dd class="note">Pergunta de seminário: ${t[4]}</dd>`).join("")+`</dl></div>`;
+}
+
+document.addEventListener("change",e=>{
+  const dd=e.target.dataset||{};
+  if(dd.c!==undefined){if(e.target.checked)S.cn[dd.c]=1;else delete S.cn[dd.c];save();render();return}
+  const k=dd.k;
+  if(!k)return;
+  if(e.target.checked)S.ck[k]=1;else delete S.ck[k];
+  save();render();
+});
+document.addEventListener("click",e=>{
+  const b=e.target.closest("button");if(!b)return;
+  if(b.dataset.w!==undefined){S.cur=+b.dataset.w;save();render()}
+  else if(b.dataset.d!==undefined){S.dic=+b.dataset.d;save();render()}
+  else if(b.id==="apply"){S.W=Math.min(16,Math.max(4,+$("weeks").value||10));S.ck={};S.cur=0;save();render()}
+  else if(b.id==="reset"){if(confirm("Zerar todo o progresso?")){S.ck={};S.cn={};S.cur=0;save();render()}}
+});
+render();
+</script>
+</body>
+</html>
